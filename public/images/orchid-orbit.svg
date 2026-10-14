@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="bg" cx="0.5" cy="0.45" r="0.7"><stop offset="0" stop-color="#a21caf"/><stop offset="1" stop-color="#3b0764"/></radialGradient><linearGradient id="ring" x1="0.1464466094067262" y1="0.14644660940672627" x2="0.8535533905932737" y2="0.8535533905932737"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#ff1f7a"/></linearGradient></defs><rect width="400" height="500" fill="url(#bg)"/>
+       <circle cx="200" cy="250" r="120" fill="none" stroke="url(#ring)" stroke-width="44"/>
+       <path d="M300 110 A70 70 0 1 0 340 230 A56 56 0 1 1 300 110 Z" fill="#ffc48a"/>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="400" height="500" filter="url(#grain)" opacity="0.32" style="mix-blend-mode:overlay"/></svg>

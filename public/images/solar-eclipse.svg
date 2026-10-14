@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="bg" x1="0.7499999999999999" y1="0.06698729810778065" x2="0.2500000000000001" y2="0.9330127018922194"><stop offset="0" stop-color="#3b0a7a"/><stop offset="1" stop-color="#14052e"/></linearGradient><linearGradient id="disc" x1="0.49999999999999994" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="#ff6a5c"/><stop offset="1" stop-color="#ff3d7f"/></linearGradient><linearGradient id="plane" x1="0.9698463103929542" y1="0.6710100716628343" x2="0.030153689607045786" y2="0.32898992833716567"><stop offset="0" stop-color="#7a1fff"/><stop offset="1" stop-color="#2b0a6b"/></linearGradient></defs><rect width="400" height="500" fill="url(#bg)"/>
+       <circle cx="190" cy="200" r="130" fill="url(#disc)"/>
+       <path d="M0 330 L400 190 L400 500 L0 500 Z" fill="url(#plane)"/>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="400" height="500" filter="url(#grain)" opacity="0.32" style="mix-blend-mode:overlay"/></svg>
