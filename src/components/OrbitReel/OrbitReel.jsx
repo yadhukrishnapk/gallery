@@ -231,8 +231,9 @@ export default function OrbitReel({
     const { items, n, len, onSelect } = propsRef.current
     const index = mod(sim.current.k, n) % len
     const item = items[index]
-    onSelect?.(item, index)
-    if (item?.href) window.location.assign(item.href)
+    // With an onSelect handler the app decides what happens; otherwise follow the item's href.
+    if (onSelect) onSelect(item, index)
+    else if (item?.href) window.location.assign(item.href)
   }, [])
 
   useImperativeHandle(ref, () => ({
@@ -240,6 +241,9 @@ export default function OrbitReel({
     previous: () => stepBy(-1),
     goTo,
     setView: changeView,
+    getView: () => (sim.current.morphTo === 1 ? 'arc' : 'ring'),
+    // Front face of the card currently at the top (used for shared-element page transitions).
+    getActiveCard: () => flipRefs.current[mod(sim.current.k, propsRef.current.n)]?.firstElementChild ?? null,
   }), [stepBy, goTo, changeView])
 
   // Animation loop: integrates rotation/morph and writes transforms straight to the DOM.

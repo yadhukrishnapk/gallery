@@ -15,3 +15,37 @@ body {
   font-family: ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Card -> detail page morph (View Transitions). */
+::view-transition-group(project-hero) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+}
+
+/* Detail page text eases in after the image lands. */
+.detail-reveal > * {
+  animation: detail-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.detail-reveal > :nth-child(1) { animation-delay: 140ms; }
+.detail-reveal > :nth-child(2) { animation-delay: 200ms; }
+.detail-reveal > :nth-child(3) { animation-delay: 260ms; }
+.detail-reveal > :nth-child(4) { animation-delay: 320ms; }
+.detail-reveal > :nth-child(n + 5) { animation-delay: 380ms; }
+
+@keyframes detail-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-reveal > * {
+    animation: none;
+  }
+}
