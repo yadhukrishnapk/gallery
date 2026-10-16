@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Navigate, useLocation, useMatch, useNavigate } from 'react-router'
-import OrbitReel from './components/OrbitReel/OrbitReel'
+import { OrbitReel } from './components/OrbitReel'
 import { projects } from './data/gallery'
 import { HERO_TRANSITION, runViewTransition, setTransitionName } from './lib/viewTransition'
 import ProjectDetail from './pages/ProjectDetail'
