@@ -2,10 +2,12 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Navigate, useLocation, useMatch, useNavigate } from 'react-router'
 import { OrbitReel } from './components/OrbitReel'
 import { projects } from './data/gallery'
+import { useEntrySound } from './hooks/useEntrySound'
 import { HERO_TRANSITION, runViewTransition, setTransitionName } from './lib/viewTransition'
 import ProjectDetail from './pages/ProjectDetail'
 
 const SITE_TITLE = 'Orbit Reel'
+const ENTRY_SOUND = '/sounds/reveal.wav'
 
 export default function App() {
   const reel = useRef(null)
@@ -14,6 +16,9 @@ export default function App() {
   const match = useMatch('/work/:slug')
   const index = match ? projects.findIndex((p) => p.slug === match.params.slug) : -1
   const project = projects[index]
+
+  // App stays mounted while projects open and close, so this plays once per visit, not on every return.
+  useEntrySound(ENTRY_SOUND)
 
   // Resolves once a navigation has been committed to the DOM, so view transitions snapshot the new page.
   const routeCommitted = useRef(null)
