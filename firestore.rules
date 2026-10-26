@@ -1,0 +1,62 @@
+rules_version = '2';
+
+// Paste this into Firebase console → Firestore Database → Rules, then Publish.
+//
+// Visitors may add their own visit and add to it later (what they looked at, their name, how long
+// they stayed), but can never read, change or delete visits. Only the /visitors login reads the list.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The /visitors login (username yad001). Keep in step with src/lib/owner.js.
+    function isOwner() {
+      return request.auth != null && request.auth.token.email == 'yad001@orbit-reel.app';
+    }
+
+    // An optional text field no longer than `max`.
+    function text(data, field, max) {
+      return !(field in data) || (data[field] is string && data[field].size() <= max);
+    }
+
+    function changed(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    match /visits/{visitId} {
+      allow read, delete: if isOwner();
+
+      allow create: if request.resource.data.keys().hasOnly([
+            'startedAt', 'lastSeenAt', 'visitor', 'visitNumber', 'host', 'landingPage', 'referrer',
+            'fromInstagram', 'type', 'os', 'browser', 'model', 'screen', 'language', 'timezone',
+            'city', 'region', 'country', 'network', 'viewed', 'opened'])
+        && request.resource.data.startedAt == request.time
+        && request.resource.data.lastSeenAt == request.time
+        && request.resource.data.visitNumber is int
+        && request.resource.data.fromInstagram is bool
+        && request.resource.data.viewed is list && request.resource.data.viewed.size() == 0
+        && request.resource.data.opened is list && request.resource.data.opened.size() == 0
+        && text(request.resource.data, 'visitor', 64)
+        && text(request.resource.data, 'host', 100)
+        && text(request.resource.data, 'landingPage', 200)
+        && text(request.resource.data, 'referrer', 300)
+        && text(request.resource.data, 'type', 20)
+        && text(request.resource.data, 'os', 40)
+        && text(request.resource.data, 'browser', 40)
+        && text(request.resource.data, 'model', 80)
+        && text(request.resource.data, 'screen', 40)
+        && text(request.resource.data, 'language', 40)
+        && text(request.resource.data, 'timezone', 60)
+        && text(request.resource.data, 'city', 100)
+        && text(request.resource.data, 'region', 100)
+        && text(request.resource.data, 'country', 100)
+        && text(request.resource.data, 'network', 150);
+
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['viewed', 'opened', 'name', 'namedAt', 'lastSeenAt'])
+        && request.resource.data.viewed is list && request.resource.data.viewed.size() <= 50
+        && request.resource.data.opened is list && request.resource.data.opened.size() <= 50
+        && text(request.resource.data, 'name', 60)
+        && (!changed(['lastSeenAt']) || request.resource.data.lastSeenAt == request.time)
+        && (!changed(['namedAt']) || request.resource.data.namedAt == request.time);
+    }
+  }
+}

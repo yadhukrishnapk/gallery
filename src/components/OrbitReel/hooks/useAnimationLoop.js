@@ -57,4 +57,7 @@ function reportFocus(S, live, setFocus, morphProgress) {
   if (focus === S.reportedFocus) return
   S.reportedFocus = focus
   setFocus(focus)
+  if (focus === null) return
+  const index = focus % live.len
+  live.onRest?.(live.items[index], index)
 }
