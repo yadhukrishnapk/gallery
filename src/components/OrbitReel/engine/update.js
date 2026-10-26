@@ -3,6 +3,7 @@ import {
   MORPH_MS,
   REST,
   SPIN_EASE,
+  VISIBLY_AT_REST,
   SPRING,
   WAVE_EVERY_MS,
   WAVE_FLIP_MS,
@@ -34,10 +35,15 @@ export function updateRotation(S, live, t, dt, morphProgress) {
   }
 }
 
-// True once the arc has fully formed and its top card has come to rest: settleArc snaps the wheel
-// exactly onto the slot when it settles, and a drag or scroll moves it off again.
+// True once the arc has fully formed and its top card has visibly come to rest: within a fraction of
+// a pixel of its slot, while the spring may still be settling the last of the way.
 export const arcAtRest = (S, geo, morphProgress) =>
-  isArc(S) && morphProgress === 1 && S.rot === slotRotation(S.k, geo.step)
+  isArc(S) &&
+  morphProgress === 1 &&
+  !S.drag?.moved &&
+  !S.wheelPending &&
+  Math.abs(S.rot - slotRotation(S.k, geo.step)) < VISIBLY_AT_REST.rot &&
+  Math.abs(S.vel) < VISIBLY_AT_REST.vel
 
 function settleArc(S, { geo, n, reducedMotion }, t, dt) {
   // Scrolling glides the arc freely; once it pauses, settle on the nearest slot.

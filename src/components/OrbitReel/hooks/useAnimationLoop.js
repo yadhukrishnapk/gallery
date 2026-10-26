@@ -1,15 +1,18 @@
 import { useEffect } from 'react'
 import { FIRST_WAVE_MS, MAX_FRAME_S } from '../OrbitReel.constants'
+import { createCruise } from '../engine/cruise'
 import { createRenderer } from '../engine/render'
 import { activeCardOf, now } from '../engine/state'
 import { arcAtRest, updateMorph, updateRotation, updateWave } from '../engine/update'
 
 // Runs the frame loop for the component's lifetime: advance the simulation, report the active item,
-// then draw. Everything it reads comes through refs, so it never restarts.
-export function useAnimationLoop({ simRef, liveRef, setActive, setFocus, cardsRef, flipsRef, childrenRef, overlayRef }) {
+// then draw. Everything it reads comes through refs, so it never restarts. While the ring just spins,
+// the browser turns it instead (see engine/cruise.js) and the loop only keeps count.
+export function useAnimationLoop({ simRef, liveRef, setActive, setFocus, stageRef, cardsRef, flipsRef, childrenRef, overlayRef }) {
   useEffect(() => {
     const S = simRef.current
     const render = createRenderer({ cardsRef, flipsRef, childrenRef, overlayRef })
+    const cruise = createCruise(stageRef)
     let last = now()
     let raf
     S.nextWaveAt = last + FIRST_WAVE_MS
@@ -22,15 +25,20 @@ export function useAnimationLoop({ simRef, liveRef, setActive, setFocus, cardsRe
       if (!live.geo) return
 
       const morphProgress = updateMorph(S, t, live.reducedMotion)
-      updateRotation(S, live, t, dt, morphProgress)
+      const cruising = cruise.follow(S, live, morphProgress)
+      if (!cruising) updateRotation(S, live, t, dt, morphProgress)
       reportActive(S, live, setActive)
       reportFocus(S, live, setFocus, morphProgress)
       const waveEnded = updateWave(S, live, t, morphProgress)
-      render(S, live, t, waveEnded)
+      if (!cruising) cruise.start(S, live, morphProgress)
+      render(S, live, t, waveEnded, cruise.cardRotation(S))
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [simRef, liveRef, setActive, setFocus, cardsRef, flipsRef, childrenRef, overlayRef])
+    return () => {
+      cancelAnimationFrame(raf)
+      cruise.stop()
+    }
+  }, [simRef, liveRef, setActive, setFocus, stageRef, cardsRef, flipsRef, childrenRef, overlayRef])
 }
 
 function reportActive(S, live, setActive) {

@@ -25,6 +25,8 @@ export const MAX_FRAME_S = 0.05 // cap on one frame's time step, so a background
 export const SPRING = { stiffness: 120, damping: 22 } // the arc settling onto a card
 export const SPIN_EASE = 2.5 // how fast the ring eases to its spin speed, 1/s
 export const REST = { rot: 1e-5, vel: 1e-4 } // below these the wheel snaps to rest
+export const VISIBLY_AT_REST = { rot: 1e-3, vel: 0.05 } // close enough for the top card to load its full photo
+export const CRUISE_TOLERANCE = 2e-3 // rad/s off its idle speed at which the browser takes over the spin
 
 // Input
 export const DRAG_THRESHOLD = { mouse: 5, touch: 9, pen: 6 } // px a press travels before it becomes a drag
