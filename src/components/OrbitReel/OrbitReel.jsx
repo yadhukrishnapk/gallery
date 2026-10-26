@@ -57,6 +57,7 @@ export function OrbitReel({
 }) {
   const rootRef = useRef(null)
   const childrenRef = useRef(null)
+  const stageRef = useRef(null)
   const overlayRef = useRef(null)
   const cardsRef = useRef([])
   const flipsRef = useRef([])
@@ -81,7 +82,7 @@ export function OrbitReel({
   const pointerHandlers = usePointerInput({ rootRef, simRef, liveRef, commands })
   const onKeyDown = useKeyboardInput(simRef, commands)
   useWheelInput({ rootRef, simRef, liveRef })
-  useAnimationLoop({ simRef, liveRef, setActive, setFocus, cardsRef, flipsRef, childrenRef, overlayRef })
+  useAnimationLoop({ simRef, liveRef, setActive, setFocus, stageRef, cardsRef, flipsRef, childrenRef, overlayRef })
 
   useImperativeHandle(
     ref,
@@ -113,7 +114,7 @@ export function OrbitReel({
         <div className={styles.childrenSlot}>{children}</div>
       </div>
 
-      <div className={styles.stage}>
+      <div ref={stageRef} className={styles.stage}>
         <ReelCards
           items={items}
           n={n}

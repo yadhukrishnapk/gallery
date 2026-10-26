@@ -23,7 +23,8 @@ export const root = ({ lightBg, draggable, className }) =>
 
 export const childrenLayer = 'pointer-events-none absolute inset-0 z-0 flex items-center justify-center'
 export const childrenSlot = 'pointer-events-auto'
-export const stage = 'absolute inset-0 [perspective:1400px]'
+// Holds the cards. The browser turns it as a whole while the ring just spins (see engine/cruise.js).
+export const stage = 'absolute inset-0 will-change-transform [perspective:1400px]'
 
 // Cards
 export const card =
