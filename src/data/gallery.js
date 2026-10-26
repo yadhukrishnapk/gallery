@@ -1,3 +1,5 @@
+import { thumbnailFor } from '../lib/thumbnails'
+
 // Your portfolio pieces. Each entry is one card on the Orbit Reel and one detail page.
 //
 // `src` (and every entry in `images`) can be either:
@@ -6,7 +8,10 @@
 //   - a full image link:  'https://example.com/photo.jpg'
 //
 // Card fields:
-//   src          – card image (also the big image on the detail page)
+//   src          – the full photo, shown on the card brought to the front and on the detail page.
+//                  The other cards show a small thumbnail of it, made automatically for photos in
+//                  /public (`npm run thumbnails`, which also runs before `dev` and `build`).
+//   thumb        – your own small version of the photo for the cards (optional; useful for links)
 //   alt          – description of the image (for screen readers)
 //   title        – shown under the card and as the detail page heading
 //   subtitle     – smaller line under the title (optional)
@@ -88,13 +93,17 @@ const slugify = (text) =>
     .filter(Boolean)
     .join('-')
 
-// Gallery entries with a guaranteed unique `slug`, used by the reel and the detail pages.
+// Gallery entries with a guaranteed unique `slug` and a card `thumb`, used by the reel and the detail pages.
 export const projects = (() => {
   const seen = new Map()
   return gallery.map((item, index) => {
     const base = item.slug || slugify(item.title || '') || `work-${index + 1}`
     const count = seen.get(base) ?? 0
     seen.set(base, count + 1)
-    return { ...item, slug: count ? `${base}-${count + 1}` : base }
+    return {
+      ...item,
+      slug: count ? `${base}-${count + 1}` : base,
+      thumb: item.thumb ?? thumbnailFor(item.src),
+    }
   })
 })()

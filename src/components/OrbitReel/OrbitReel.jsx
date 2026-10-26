@@ -18,7 +18,8 @@ import { ReelOverlay } from './parts/ReelOverlay'
  * A wheel of image cards. It idles as a slowly spinning ring; clicking a card zooms into an arc with
  * that card on top, plus a caption and prev/next controls. Escape goes back to the ring.
  *
- * `items` are `{ src, alt?, title?, subtitle?, href? }`, repeated as needed to fill the wheel.
+ * `items` are `{ src, thumb?, alt?, title?, subtitle?, href? }`, repeated as needed to fill the wheel.
+ * Cards show the small `thumb` when there is one; the card resting on top of the arc switches to the full `src`.
  * `ref` exposes `{ next, previous, goTo(index), setView('ring' | 'arc'), getView, getActiveCard }`.
  */
 export function OrbitReel({
@@ -57,10 +58,11 @@ export function OrbitReel({
   const rootRef = useRef(null)
   const childrenRef = useRef(null)
   const overlayRef = useRef(null)
-  const cardRefs = useRef([])
-  const flipRefs = useRef([])
+  const cardsRef = useRef([])
+  const flipsRef = useRef([])
 
-  const [active, setActive] = useState(0)
+  const [active, setActive] = useState(0) // item on top
+  const [focus, setFocus] = useState(null) // card resting on top of the arc, which shows its full photo
   const reducedMotion = usePrefersReducedMotion()
   const len = Math.max(1, items.length)
   const { n, geo } = useReelLayout(rootRef, { len, count, mobileCount, captions, controls, aspect, gap, arc, apex })
@@ -79,7 +81,7 @@ export function OrbitReel({
   const pointerHandlers = usePointerInput({ rootRef, simRef, liveRef, commands })
   const onKeyDown = useKeyboardInput(simRef, commands)
   useWheelInput({ rootRef, simRef, liveRef })
-  useAnimationLoop({ simRef, liveRef, setActive, cardRefs, flipRefs, childrenRef, overlayRef })
+  useAnimationLoop({ simRef, liveRef, setActive, setFocus, cardsRef, flipsRef, childrenRef, overlayRef })
 
   useImperativeHandle(
     ref,
@@ -90,7 +92,7 @@ export function OrbitReel({
       setView: commands.changeView,
       getView: () => viewOf(simRef.current),
       // Front face of the card on top (used for shared-element page transitions).
-      getActiveCard: () => flipRefs.current[activeCardOf(simRef.current, liveRef.current.n)]?.firstElementChild ?? null,
+      getActiveCard: () => flipsRef.current[activeCardOf(simRef.current, liveRef.current.n)]?.firstElementChild ?? null,
     }),
     [commands, liveRef],
   )
@@ -115,12 +117,13 @@ export function OrbitReel({
         <ReelCards
           items={items}
           n={n}
+          focus={focus}
           width={geo?.cardW}
           height={geo?.cardH}
           radius={radius}
           accentColor={accentColor}
-          cardRefs={cardRefs}
-          flipRefs={flipRefs}
+          cardsRef={cardsRef}
+          flipsRef={flipsRef}
         />
       </div>
 

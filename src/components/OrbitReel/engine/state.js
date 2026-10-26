@@ -31,7 +31,8 @@ export function createSimState(defaultView) {
     lastStep: 0, // last slot change; autoplay waits `interval` after it
     waveStart: null, // start of the flip wave in progress, if any
     nextWaveAt: 0,
-    reportedActive: -1, // last card reported to React
+    reportedActive: -1, // last active card reported to React
+    reportedFocus: null, // last focus card reported to React: the card resting on top of the arc, if any
   }
 }
 
@@ -41,6 +42,9 @@ export const activeCardOf = (S, n) => mod(S.k, n)
 
 // Slot whose card is on top at rotation `rot`.
 export const slotAt = (rot, n) => Math.round(-rot / (TAU / n))
+
+// Rotation that puts slot `k` on top.
+export const slotRotation = (k, step) => -k * step
 
 // The slot nearest the current rotation that shows `card` on top.
 export function nearestSlotFor(card, rot, n) {

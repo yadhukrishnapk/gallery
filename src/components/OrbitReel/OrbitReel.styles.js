@@ -32,6 +32,12 @@ export const cardFlipper = 'absolute inset-0 [transform-style:preserve-3d]'
 export const cardFront =
   'absolute inset-0 overflow-hidden bg-neutral-500/20 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55),0_2px_6px_-2px_rgba(0,0,0,0.25)] [backface-visibility:hidden]'
 export const cardImage = 'pointer-events-none block size-full object-cover'
+// The full photo, laid over the thumbnail of the card in focus and faded in once it has loaded.
+export const cardFullImage = (loaded) =>
+  cx(
+    'pointer-events-none absolute inset-0 size-full object-cover transition-opacity duration-300 motion-reduce:transition-none',
+    loaded ? 'opacity-100' : 'opacity-0',
+  )
 export const cardBack =
   'absolute inset-0 flex items-end justify-start overflow-hidden p-[8%] text-[clamp(10px,1.1vw,14px)] tracking-wider text-white/90 tabular-nums [backface-visibility:hidden] [transform:rotateY(180deg)]'
 export const cardBackFill = (accent) =>

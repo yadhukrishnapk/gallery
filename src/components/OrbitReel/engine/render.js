@@ -5,7 +5,7 @@ import { waveFlipAt } from './update'
 // Returns a `render(S, live, t, waveEnded)` that writes one frame straight to the DOM through the
 // given refs. It skips all writes while nothing moves (settled arc, paused ring), so an idle reel
 // costs nothing.
-export function createRenderer({ cardRefs, flipRefs, childrenRef, overlayRef }) {
+export function createRenderer({ cardsRef, flipsRef, childrenRef, overlayRef }) {
   const last = {}
 
   return function render(S, live, t, waveEnded) {
@@ -20,7 +20,7 @@ export function createRenderer({ cardRefs, flipRefs, childrenRef, overlayRef }) 
     const reach = Math.max(geo.cardW, geo.cardH) * orbit.s * 0.75
 
     for (let i = 0; i < n; i++) {
-      const card = cardRefs.current[i]
+      const card = cardsRef.current[i]
       if (!card) continue
       const theta = S.rot + i * geo.step
       const { x, y } = pointOnOrbit(orbit, theta)
@@ -35,7 +35,7 @@ export function createRenderer({ cardRefs, flipRefs, childrenRef, overlayRef }) 
       // Cards nearer the top of the wheel stack in front.
       card.style.zIndex = String(Math.round(200 + Math.cos(theta) * 100))
 
-      const flipper = flipRefs.current[i]
+      const flipper = flipsRef.current[i]
       if (flipper) {
         const flip = waveFlipAt(theta, S.waveStart, t)
         flipper.style.transform = flip > 0 && flip < 360 ? `rotateY(${flip}deg)` : ''

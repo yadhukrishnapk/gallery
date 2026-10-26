@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Card thumbnails, made by `npm run thumbnails`
+public/thumbs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
