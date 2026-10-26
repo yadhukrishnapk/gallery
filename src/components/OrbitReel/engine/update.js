@@ -8,7 +8,7 @@ import {
   WAVE_FLIP_MS,
   WAVE_SPREAD_MS,
 } from '../OrbitReel.constants'
-import { isArc, moveToSlot, slotAt } from './state'
+import { isArc, moveToSlot, slotAt, slotRotation } from './state'
 
 // Per-frame simulation steps, run in order by hooks/useAnimationLoop.js. Each one mutates the sim
 // state `S`; `live` holds the latest props and geometry. `t` is in ms, `dt` in seconds.
@@ -34,6 +34,11 @@ export function updateRotation(S, live, t, dt, morphProgress) {
   }
 }
 
+// True once the arc has fully formed and its top card has come to rest: settleArc snaps the wheel
+// exactly onto the slot when it settles, and a drag or scroll moves it off again.
+export const arcAtRest = (S, geo, morphProgress) =>
+  isArc(S) && morphProgress === 1 && S.rot === slotRotation(S.k, geo.step)
+
 function settleArc(S, { geo, n, reducedMotion }, t, dt) {
   // Scrolling glides the arc freely; once it pauses, settle on the nearest slot.
   if (S.wheelPending && t > S.wheelUntil) {
@@ -42,7 +47,7 @@ function settleArc(S, { geo, n, reducedMotion }, t, dt) {
   }
   if (S.wheelPending) return
 
-  const target = -S.k * geo.step
+  const target = slotRotation(S.k, geo.step)
   const atRest = Math.abs(target - S.rot) < REST.rot && Math.abs(S.vel) < REST.vel
   if (reducedMotion || atRest) {
     S.rot = target
