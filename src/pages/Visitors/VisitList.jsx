@@ -1,7 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import { signOutOwner } from './ownerAuth'
 import { VisitCard } from './VisitCard'
-import { fetchVisits, formatAgo, formatDevice, formatPlace, loadError, MAX_VISITS, removeVisit, summarize } from './visitorsData'
+import {
+  fetchVisits,
+  formatAgo,
+  formatDevice,
+  formatPlace,
+  loadError,
+  MAX_VISITS,
+  removeVisit,
+  summarize,
+  visitsByPhone,
+} from './visitorsData'
 import * as styles from './Visitors.styles'
 
 export function VisitList() {
@@ -45,6 +55,7 @@ export function VisitList() {
 
   const named = visits?.filter((v) => v.name) ?? []
   const totals = visits && summarize(visits)
+  const phones = visits && visitsByPhone(visits)
 
   return (
     <div className={styles.page}>
@@ -96,7 +107,7 @@ export function VisitList() {
             ) : (
               <ul className={styles.list}>
                 {visits.map((v) => (
-                  <VisitCard key={v.id} visit={v} onRemove={remove} />
+                  <VisitCard key={v.id} visit={v} phone={phones.get(v.visitor)} onRemove={remove} />
                 ))}
               </ul>
             )}

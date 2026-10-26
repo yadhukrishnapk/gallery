@@ -17,6 +17,11 @@ service cloud.firestore {
       return !(field in data) || (data[field] is string && data[field].size() <= max);
     }
 
+    // An optional number field.
+    function number(data, field) {
+      return !(field in data) || data[field] is number;
+    }
+
     function changed(fields) {
       return request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
     }
@@ -26,18 +31,21 @@ service cloud.firestore {
 
       allow create: if request.resource.data.keys().hasOnly([
             'startedAt', 'lastSeenAt', 'visitor', 'visitNumber', 'host', 'landingPage', 'referrer',
-            'fromInstagram', 'type', 'os', 'browser', 'model', 'screen', 'language', 'timezone',
-            'city', 'region', 'country', 'network', 'viewed', 'opened'])
+            'linkTag', 'metaClickId', 'fromInstagram', 'type', 'os', 'browser', 'model', 'screen',
+            'language', 'timezone', 'city', 'region', 'country', 'countryCode', 'network',
+            'latitude', 'longitude', 'accuracyKm', 'viewed', 'opened'])
         && request.resource.data.startedAt == request.time
         && request.resource.data.lastSeenAt == request.time
         && request.resource.data.visitNumber is int
         && request.resource.data.fromInstagram is bool
+        && (!('metaClickId' in request.resource.data) || request.resource.data.metaClickId is bool)
         && request.resource.data.viewed is list && request.resource.data.viewed.size() == 0
         && request.resource.data.opened is list && request.resource.data.opened.size() == 0
         && text(request.resource.data, 'visitor', 64)
         && text(request.resource.data, 'host', 100)
         && text(request.resource.data, 'landingPage', 200)
         && text(request.resource.data, 'referrer', 300)
+        && text(request.resource.data, 'linkTag', 80)
         && text(request.resource.data, 'type', 20)
         && text(request.resource.data, 'os', 40)
         && text(request.resource.data, 'browser', 40)
@@ -48,7 +56,11 @@ service cloud.firestore {
         && text(request.resource.data, 'city', 100)
         && text(request.resource.data, 'region', 100)
         && text(request.resource.data, 'country', 100)
-        && text(request.resource.data, 'network', 150);
+        && text(request.resource.data, 'countryCode', 2)
+        && text(request.resource.data, 'network', 150)
+        && number(request.resource.data, 'latitude')
+        && number(request.resource.data, 'longitude')
+        && number(request.resource.data, 'accuracyKm');
 
       allow update: if request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['viewed', 'opened', 'name', 'namedAt', 'lastSeenAt'])

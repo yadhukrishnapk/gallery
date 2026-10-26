@@ -37,7 +37,9 @@ export const hiName = 'm-0 font-medium'
 export const hiMeta = 'm-0 text-right text-xs text-neutral-400'
 
 // One visit
-export const card = 'flex flex-col gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4'
+export const card = 'flex flex-col rounded-2xl border border-white/[0.06] bg-white/[0.03]'
+export const cardToggle =
+  'flex w-full cursor-pointer flex-col gap-2 rounded-2xl border-0 bg-transparent p-4 text-left font-[inherit] text-inherit transition-colors hover:bg-white/[0.02]'
 export const cardHead = 'flex flex-wrap items-center justify-between gap-2'
 export const who = 'm-0 text-base font-semibold'
 export const badges = 'flex flex-wrap gap-1.5'
@@ -46,6 +48,13 @@ export const instagramBadge = 'rounded-full bg-pink-500/20 px-2 py-0.5 text-xs t
 export const when = 'm-0 text-xs text-neutral-400'
 export const details = 'm-0 grid grid-cols-[5.5rem_1fr] gap-x-3 gap-y-1 text-sm'
 export const detailLabel = 'text-neutral-500'
-export const detailValue = 'm-0 text-neutral-200'
+export const detailValue = 'm-0 min-w-0 text-neutral-200 [overflow-wrap:anywhere]'
+export const toggleHint = 'text-xs text-neutral-500'
+
+// All details of a visit
+export const more = 'flex flex-col gap-4 border-t border-white/[0.06] px-4 pt-3 pb-4'
+export const group = 'flex flex-col gap-1.5'
+export const groupTitle = 'm-0 text-xs font-medium tracking-wide text-neutral-500 uppercase'
+export const link = 'text-sky-300 underline-offset-2 hover:underline'
 export const removeButton =
   'self-end cursor-pointer border-0 bg-transparent p-0 text-xs text-neutral-500 transition-colors hover:text-red-400'

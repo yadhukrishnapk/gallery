@@ -9,11 +9,26 @@ export async function lookUpPlace() {
   try {
     const res = await fetch(GEO_URL, { signal: controller.signal })
     if (!res.ok) return {}
-    const { city, region, country, organization_name: network } = await res.json()
-    return { city, region, country, network }
+    const geo = await res.json()
+    return {
+      city: geo.city,
+      region: geo.region,
+      country: geo.country,
+      countryCode: geo.country_code,
+      network: geo.organization_name,
+      // The middle of the area the address belongs to, not the visitor's own spot.
+      latitude: roundedCoordinate(geo.latitude),
+      longitude: roundedCoordinate(geo.longitude),
+      accuracyKm: Number.isFinite(geo.accuracy) ? geo.accuracy : undefined,
+    }
   } catch {
     return {} // blocked, offline or too slow: the visit is recorded without a place
   } finally {
     clearTimeout(timer)
   }
+}
+
+function roundedCoordinate(value) {
+  const n = Number.parseFloat(value)
+  return Number.isFinite(n) ? Math.round(n * 100) / 100 : undefined
 }

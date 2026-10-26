@@ -1,7 +1,12 @@
 // What a visitor's browser reveals about their device, without asking them anything.
 
-// Instagram's in-app browser names the iPhone by Apple's internal model code.
+// Instagram's, Threads' and Facebook's in-app browsers name the iPhone by Apple's internal model code.
 const IPHONE_NAMES = {
+  'iPhone10,3': 'iPhone X',
+  'iPhone10,6': 'iPhone X',
+  'iPhone11,2': 'iPhone XS',
+  'iPhone11,6': 'iPhone XS Max',
+  'iPhone11,8': 'iPhone XR',
   'iPhone12,1': 'iPhone 11',
   'iPhone12,3': 'iPhone 11 Pro',
   'iPhone12,5': 'iPhone 11 Pro Max',
@@ -28,12 +33,27 @@ const IPHONE_NAMES = {
   'iPhone17,3': 'iPhone 16',
   'iPhone17,4': 'iPhone 16 Plus',
   'iPhone17,5': 'iPhone 16e',
+  'iPhone18,1': 'iPhone 17 Pro',
+  'iPhone18,2': 'iPhone 17 Pro Max',
+  'iPhone18,3': 'iPhone 17',
+  'iPhone18,4': 'iPhone Air',
 }
 
-// First match wins, so in-app browsers come before the browser engines they are built on.
+// First match wins, so in-app browsers come before the browser engines they are built on. A browser
+// ending in " app" tells the /visitors page which app the link was tapped in.
 const BROWSERS = [
+  [/\bBarcelona\b/, 'Threads app'],
   [/\bInstagram\b/, 'Instagram app'],
-  [/FBAN|FBAV/, 'Facebook app'],
+  [/MessengerForiOS|FB_IAB\/Orca|FBAN\/Messenger/, 'Messenger app'],
+  [/FBAN|FBAV|FB_IAB/, 'Facebook app'],
+  [/LinkedInApp/, 'LinkedIn app'],
+  [/Snapchat/, 'Snapchat app'],
+  [/musical_ly|BytedanceWebview|TikTok/, 'TikTok app'],
+  [/Twitter/, 'X app'],
+  [/Telegram/, 'Telegram app'],
+  [/\bLine\//, 'LINE app'],
+  [/Pinterest/, 'Pinterest app'],
+  [/\bGSA\//, 'Google app'],
   [/SamsungBrowser/, 'Samsung Internet'],
   [/EdgiOS|Edg\//, 'Edge'],
   [/OPR\/|OPiOS/, 'Opera'],
@@ -53,6 +73,16 @@ export function describeDevice(ua = navigator.userAgent, touchPoints = navigator
     model: modelName(ua),
   }
 }
+
+// Tags you add to the link, like ?from=story, so you can tell which of your links was tapped.
+const TAG_PARAMS = ['from', 'src', 'ref', 'utm_source', 'utm_medium', 'utm_campaign']
+export function linkTag(search = window.location.search) {
+  const params = new URLSearchParams(search)
+  return [...new Set(TAG_PARAMS.map((name) => params.get(name)?.trim()).filter(Boolean))].join(' / ').slice(0, 80)
+}
+
+// Instagram and Facebook add a click id to every link tapped in them, even when the link opens in another browser.
+export const hasMetaClickId = (search = window.location.search) => new URLSearchParams(search).has('fbclid')
 
 export function describeScreen() {
   const ratio = Math.round((window.devicePixelRatio || 1) * 100) / 100
@@ -89,11 +119,14 @@ function osName(ua, iPadAsMac) {
 }
 
 function modelName(ua) {
-  // Instagram on iPhone: "Instagram 337.0.3.23.54 (iPhone14,5; iOS 17_5; …)"
-  const apple = ua.match(/Instagram [\d.]+ \((i(?:Phone|Pad)\d+,\d+);/)
+  // Instagram (or Threads, "Barcelona") on iPhone: "Instagram 337.0.3.23.54 (iPhone14,5; iOS 17_5; …)"
+  const apple = ua.match(/(?:Instagram|Barcelona) [\d.]+ \((i(?:Phone|Pad)\d+,\d+);/)
   if (apple) return IPHONE_NAMES[apple[1]] ?? apple[1]
+  // Facebook and Messenger: "[FBAN/FBIOS;FBDV/iPhone14,5;…]", or "FBDV/SM-S911B" on Android
+  const facebook = ua.match(/FBDV\/([^;\]]+)/)
+  if (facebook) return IPHONE_NAMES[facebook[1]] ?? facebook[1]
   // Instagram on Android: "Instagram 312.1.0.34.111 Android (33/13; 450dpi; 1080x2340; samsung; SM-S911B; …)"
-  const droid = ua.match(/Instagram [\d.]+ Android \([^;]*;[^;]*;[^;]*; ([^;]+); ([^;]+);/)
+  const droid = ua.match(/(?:Instagram|Barcelona) [\d.]+ Android \([^;]*;[^;]*;[^;]*; ([^;]+); ([^;]+);/)
   if (droid) return `${droid[1].charAt(0).toUpperCase()}${droid[1].slice(1)} ${droid[2]}`
   // Other Android browsers that still name the model: "Android 13; SM-S911B Build/…". Chrome hides it as "K".
   const android = ua.match(/Android [\d.]+; ([^;)]+?)(?: Build\/|\))/)
