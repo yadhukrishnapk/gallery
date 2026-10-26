@@ -3,7 +3,7 @@ import { firebaseApp, firestore } from './firebase'
 import { lookUpPlace } from './geo'
 import { isOwnerBrowser } from './owner'
 import { readStored, writeStored } from './storage'
-import { describeDevice, describeScreen, lookUpModel } from './visitDetails'
+import { describeDevice, describeScreen, hasMetaClickId, linkTag, lookUpModel } from './visitDetails'
 
 const VISITOR_KEY = 'orbit:visitor' // random id for this browser, to tell repeat visitors from new ones
 const VISIT_COUNT_KEY = 'orbit:visit-count'
@@ -29,6 +29,8 @@ export async function startVisit() {
       host: window.location.host,
       landingPage: window.location.pathname,
       referrer: document.referrer.slice(0, 300),
+      linkTag: linkTag(),
+      metaClickId: hasMetaClickId(),
       ...device,
       model,
       screen: describeScreen(),

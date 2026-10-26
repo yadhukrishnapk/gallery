@@ -1,5 +1,6 @@
 import { collection, deleteDoc, doc, getDocs, limit, orderBy, query } from 'firebase/firestore/lite'
 import { firestore } from '../../lib/firebase'
+import { phoneName } from './visitFacts'
 
 export const MAX_VISITS = 500 // newest visits loaded at once
 const DAY_MS = 86_400_000
@@ -78,7 +79,23 @@ export function formatStay({ startedAt, lastSeenAt }) {
 }
 
 export const formatPlace = (visit) => [...new Set([visit.city, visit.region, visit.country].filter(Boolean))].join(', ')
-export const formatDevice = (visit) => [visit.model, visit.os, visit.browser].filter(Boolean).join(' · ')
+// "iPhone 12–14? · iOS 17.5 · Instagram app", with "?" when the model is guessed from the screen size.
+export function formatDevice(visit) {
+  const phone = phoneName(visit)
+  return [phone.guessed ? `${phone.short}?` : phone.short, visit.os, visit.browser].filter(Boolean).join(' · ')
+}
+
+// How many of the loaded visits came from each phone, and when the earliest of them was.
+export function visitsByPhone(visits) {
+  const phones = new Map()
+  for (const visit of visits) {
+    const phone = phones.get(visit.visitor) ?? { count: 0, first: visit.startedAt }
+    phone.count += 1
+    if (visit.startedAt < phone.first) phone.first = visit.startedAt
+    phones.set(visit.visitor, phone)
+  }
+  return phones
+}
 
 export function ordinal(n) {
   const suffix = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th'
