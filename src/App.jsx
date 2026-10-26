@@ -1,8 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Navigate, useLocation, useMatch, useNavigate } from 'react-router'
 import { OrbitReel } from './components/OrbitReel'
+import { SayHiPrompt } from './components/SayHiPrompt'
 import { projects } from './data/gallery'
 import { useEntrySound } from './hooks/useEntrySound'
+import { useVisitTracking } from './hooks/useVisitTracking'
 import { HERO_TRANSITION, runViewTransition, setTransitionName } from './lib/viewTransition'
 import ProjectDetail from './pages/ProjectDetail'
 
@@ -19,6 +21,12 @@ export default function App() {
 
   // App stays mounted while projects open and close, so this plays once per visit, not on every return.
   useEntrySound(ENTRY_SOUND)
+
+  // Records who visits and what they look at, for your private list at /visitors.
+  const track = useVisitTracking()
+  useEffect(() => {
+    if (project) track.opened(project.title)
+  }, [project, track])
 
   // Resolves once a navigation has been committed to the DOM, so view transitions snapshot the new page.
   const routeCommitted = useRef(null)
@@ -86,6 +94,7 @@ export default function App() {
           backgroundColor="#0A0A0A"
           paused={!!project}
           onSelect={openProject}
+          onRest={(item) => track.viewed(item.title)}
         />
       </div>
       {project && (
@@ -99,6 +108,7 @@ export default function App() {
           onShow={showProject}
         />
       )}
+      <SayHiPrompt enabled={track.active} onSend={track.named} />
     </main>
   )
 }

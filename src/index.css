@@ -49,3 +49,11 @@ body {
     animation: none;
   }
 }
+
+/* The "Who's this?" box slides up from the bottom. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}

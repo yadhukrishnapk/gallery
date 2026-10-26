@@ -49,6 +49,7 @@ export function OrbitReel({
   ariaLabel = DEFAULT_ARIA_LABEL,
   onViewChange, // (view)
   onActiveChange, // (item, index)
+  onRest, // (item, index) once a card comes to rest on top of the arc and shows its full photo
   onSelect, // (item, index) when the top card is clicked; without it, follows item.href
   ref,
   children, // centred inside the ring; fades out in the arc
@@ -72,7 +73,7 @@ export function OrbitReel({
   // Everything the animation loop and input handlers read, so they never need to restart.
   const liveRef = useLatestRef({
     items, n, len, geo, spin, autoplay, interval, tilt, flipWave, draggable, wheel, pauseOnHover, zoomOnClick,
-    frozen: paused || reducedMotion, reducedMotion, onViewChange, onActiveChange, onSelect,
+    frozen: paused || reducedMotion, reducedMotion, onViewChange, onActiveChange, onRest, onSelect,
   })
 
   const simRef = useRef(null)
